@@ -1,6 +1,4 @@
-/*
-   Пример использования библиотеки GyverButton, все возможности в одном скетче.
-*/
+
 //led strip settings
 #define STRIP_PIN 6 //led pin
 #define NUMLEDS 12 //leds count
