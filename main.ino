@@ -1,12 +1,11 @@
-
 //led strip settings
-#define STRIP_PIN 6 //led pin
-#define NUMLEDS 12 //leds count
+#define STRIP_PIN 2 //led pin
+#define NUMLEDS 17 //leds count
 #define COLOR_DEBTH 3
 #include <microLED.h>   // lib connect
 microLED<NUMLEDS, STRIP_PIN, MLED_NO_CLOCK, LED_WS2818, ORDER_GRB, CLI_AVER> strip;
 
-#define PIN 2				// кнопка подключена сюда (PIN --- КНОПКА --- GND)
+#define PIN 6				// кнопка подключена сюда (PIN --- КНОПКА --- GND)
 
 #include "GyverButton.h"
 GButton butt1(PIN);
@@ -17,12 +16,12 @@ int value = 0;
 void setup() {
   Serial.begin(9600);
 
-  strip.setBrightness(150);
+  strip.setBrightness(255);
   strip.clear();
   strip.show(); // вывод изменений на ленту
 
   butt1.setDebounce(10);        // настройка антидребезга (по умолчанию 80 мс)
-  butt1.setTimeout(10);        // настройка таймаута на удержание (по умолчанию 500 мс)
+  butt1.setTimeout(100);        // настройка таймаута на удержание (по умолчанию 500 мс)
   butt1.setClickTimeout(100);   // настройка таймаута между кликами (по умолчанию 300 мс)
 
   butt1.setType(HIGH_PULL);
@@ -31,32 +30,46 @@ void setup() {
 
 void loop() {
   butt1.tick();  
+    if (butt1.isSingle()){
+      value++;
+      if(value > 9){
+        value =0;
+      }
+           Serial.println(value);         // проверка на один клик
+      
+}
   if (butt1.isHold()||butt1.isClick()){
-     //  Serial.println("Holding");        // проверка на удержание
+       Serial.println("Holding");        // проверка на удержание
       runningDots();      
       
   // Serial.println("Holded");  
-   }    else   {
-     breathing();
+   }else if (value > 5 || value > 9){
+     rainbow();
+
+   }
+       else   {
+    breathing();
      m4Shprot();
+   //rainbow();
    }
 
 }
 void m4Shprot() {
-  strip.fill(mMagenta);
+  strip.fill(mKugoo);
   strip.show();         // выводим изменения
   delay(30);
 
 }
 
 void rainbow() {
+  strip.setBrightness(255);
   static byte counter = 0;
   for (int i = 0; i < NUMLEDS; i++) {
     strip.set(i, mWheel8(counter + i * 255 / NUMLEDS));   // counter смещает цвет
   }
-  counter += 3;   // counter имеет тип byte и при достижении 255 сбросится в 0
+  counter += 1;   // counter имеет тип byte и при достижении 255 сбросится в 0
   strip.show();
-  delay(20);
+  delay(10);
 }
 
 void runningDots() {
@@ -77,14 +90,14 @@ void runningDots() {
 void breathing() {
   static int dir = 1;
   static int bright = 0;
-  bright += dir * 4;    // 5 - множитель скорости изменения
+  bright += dir * 5;    // 5 - множитель скорости изменения
 
   if (bright > 255) {
     bright = 255;
     dir = -1;
   }
-  if (bright < 0) {
-    bright = 0;
+  if (bright < 70) {
+    bright = 70;
     dir = 1;
   }
   strip.setBrightness(bright);
