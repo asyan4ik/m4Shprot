@@ -31,7 +31,7 @@ void setup() {
 void loop() {
   butt1.tick();  
     if (butt1.isSingle()){
-      value++;
+      value++;  // при очень коротком нажатие счетчик растет и при достижении 5 включится эфект радуги вместо затухания.
       if(value > 9){
         value =0;
       }
